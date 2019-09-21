@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="windows-1251">
+	<title>Форма обратной связи</title>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="./js/validate.js"></script>
+<link rel="stylesheet" href="./css/style.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+
+<body>
+<div class="panel panel-default main">
+  <div class="panel-heading text">Форма обратной связи</div>
+  <div class="panel-body">
+	<form method="POST" action="" role="form">
+		<div class="text">Все поля обязательны для заполнения!</div>
+
+		<div class="form-group">
+			<label>Введите ФИО на русском языке</label>
+			<div class="inputText"><input class="form-control" type="text" name="soname" id="soname" min="3" max="20" pattern="^[А-Яа-яЁё]+$" placeholder="Фамилия" required></div><br>
+		</div>	
+		
+		<div class="form-group">
+			<div class="inputText"><input class="form-control" type="text" name="name" id="name1" min="3" max="20" pattern="^[А-Яа-яЁё]+$" required placeholder="Имя"></div><br>
+		</div>
+		
+		<div class="form-group">
+			<div class="inputText"><input class="form-control" type="text" name="ots" id="ots" min="3" max="20" pattern="^[А-Яа-яЁё]+$" required placeholder="Отчество"></div><br>
+		</div>
+		
+		<div class="form-group">
+			<label>Введите действующий e-mail для связи</label>
+			<div class="inputText"><input class="form-control" type="text" name="email" id="email" pattern="^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$" required placeholder="e-mail"></div><br>
+		</div>
+		
+		<div class="form-group">
+			<label>Введите интересующий Вас вопрос ниже</label>
+			<div class="inputText"><textarea class="form-control" type="text" name="text" id="text" min="10" max="200" required placeholder="Текст вопроса"></textarea></div><br>
+		</div>	
+		
+		<div class="form-group">
+			<button type="submit" class="btn btn-info" id="send">Отправить</button>
+			<div class="text has-error" id="msg"> &nbsp </div>
+		</div>
+		</div>
+	</form>
+</div>
+
+</body>
+
+</html>
