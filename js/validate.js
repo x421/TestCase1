@@ -5,8 +5,6 @@
 	otsError = 0b100;
 	emailError = 0b1000;
 	
-	var dataOut = -4;
-	var mail = "testmail@mail1111.ru"
 	regNames = new RegExp("^[А-Яа-яё]+$", "msiu");
 	
 	name1 = document.getElementById("name1");
@@ -22,15 +20,6 @@
 	function validateEmail(email) {
 	  var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	  return re.test(email);
-	}
-	
-	function sendMail()
-	{
-		document.location.href = "mailto:"+ mail +"?subject=обратная связь"
-		+ "&body=ФИО: "+soname.value.trim()+" "+name1.value.trim()+" "+
-		ots.value.trim()+"<br>"+
-		"email: "+email.value.trim()+"<br>"+
-		"Сообщение: "+text.value.trim();
 	}
 	
 	function parseError1(error)
@@ -86,7 +75,6 @@
 		switch(parseInt(answer))
 		{
 			case 0: 
-				sendMail();
 				msg.innerText="Ваш запрос успешно отправлен!";
 				break;
 			case -1:
