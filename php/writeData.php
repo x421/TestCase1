@@ -1,6 +1,9 @@
 <?php
-include 'db.php';
+include 'settings.php';
 include 'validateData.php';
+include './PHPMailer/SMTP.php';
+include './PHPMailer/Exception.php';
+include './PHPMailer/PHPMailer.php';
 
 
 $strings[0] = $_POST["name"];
@@ -9,46 +12,68 @@ $strings[2] = $_POST["ots"];
 $strings[3] = $_POST["email"];
 $strings[4] = $_POST["text"];
 
-if(validate($strings) == 0)
+$valResult = validate($strings);
+
+if($valResult != 0)
 {
-	echo "-2";
-	exit(-2); // данные введены неккоректно
-}
-try
-{
-	$pdo = new PDO("mysql:dbname=users;host=127.0.0.1", $user, $password);
-	$sql = "SELECT count(email) FROM Users WHERE email=:mail";
-	$sth = $pdo->prepare($sql);
-	$sth->execute(array(":mail" => $strings[3]));
-	$output = $sth->fetchColumn();
-}catch(PDOException e)
-{
-	echo "-3";
-	exit(-3);
+	echo $valResult;
+	exit($valResult); // неверно что то
 }
 
-if($output > 0)
+$mysqli = new mysqli('localhost', $user, $password, 'users');
+
+if (mysqli_connect_errno()) {
+    echo "-3";
+    exit(-3);
+}
+
+$mysqli->set_charset("utf8");
+$mysqli->query("SET NAMES `utf8`");
+
+// Проверка email
+$sql = "SELECT count(email) FROM Users WHERE email=?";
+$stm = $mysqli->prepare($sql);
+$stm->bind_param("s", $strings[3]);
+$stm->execute();
+$stm->bind_result($count);
+$stm->fetch();
+$stm->close();
+
+if($count > 0)
 {
-	echo "-1";
+	echo "-1"; // такой mail уже есть
 	exit(-1);
 }
-try
-{
-	$pdo->exec('SET CHARACTER SET utf8');
-	$sql = "INSERT INTO Users(name, soname, ots, email, text) VALUES (?, ?, ?, ?, ?)";
-	$sth = $pdo->prepare($sql);
-	$sth->execute(array($strings[0], $strings[1], $strings[2], $strings[3], $strings[4]));
-}catch(PDOException e)
-{
-	echo "-3";
-	exit(-3);
-}
 
-// Без SMTP работать не будет
-$boolMail = mail($siteAdminMail, "Форма обратной связи",
-"ФИО: "+$strings[1]+" "+$strings[0]+" "+$strings[2]+"\r\n e-mail: "+$strings[3]+" \r\n Текст вопроса: "+$strings[4]+"");
+// Запись в базу
+$sql = "INSERT INTO Users(name, soname, ots, email, text) VALUES (?, ?, ?, ?, ?)";
+$stm = $mysqli->prepare($sql);
+$stm->bind_param("sssss", $strings[0], $strings[1], $strings[2], $strings[3], $strings[4]);
+$stm->execute();
+$stm->close();
 
-if($boolMail == false)
+// Отправка почты
+$mail = new PHPMailer\PHPMailer\PHPMailer;
+
+$mail->isSMTP();
+$mail->CharSet = 'UTF-8';
+$mail->Host = $server;
+$mail->SMTPAuth = $auth;
+$mail->Username = $smtpUsername;
+$mail->Password = $smtpPass;
+$mail->Port = $smtpPort;
+$mail->SMTPSecure = $secure;
+
+$mail->From = $mailFrom;
+$mail->addAddress($siteAdminMail);
+
+$mail->isHTML(true);
+
+$mail->Subject = 'Форма обратной связи';
+$mail->Body    = "ФИО: ".strval($strings[1])." ".strval($strings[0])." ".strval($strings[2])."<br> e-mail: ".strval($strings[3])." <br> Текст вопроса: ".strval($strings[4])."";
+$mail->AltBody = "ФИО: ".strval($strings[1])." ".strval($strings[0])." ".strval($strings[2])." e-mail: ".strval($strings[3])."  Текст вопроса: ".strval($strings[4])."";
+
+if($mail->send() == false)
 {
 	echo "-4";
 	exit(-4);
